@@ -1,0 +1,43 @@
+service: appsync-serverless-poc
+frameworkVersion: "3"
+configValidationMode: error
+
+plugins:
+  - serverless-appsync-plugin
+
+provider:
+  name: aws
+  region: ap-northeast-1
+
+appSync:
+  name: AppSync Playground(serverless)
+  schema: schema.graphql
+
+  authentication:
+    type: API_KEY
+
+  dataSources:
+    catstronautsRestApi:
+      type: HTTP
+      config:
+        endpoint: https://odyssey-lift-off-rest-api.herokuapp.com
+
+  pipelineFunctions:
+    getTracksForHome:
+      dataSource: catstronautsRestApi
+      code: functions/getTracksForHome.js
+
+    getAuthor:
+      dataSource: catstronautsRestApi
+      code: functions/getAuthor.js
+
+  resolvers:
+    Query.tracksForHome:
+      code: resolvers/Query.tracksForHome.js
+      functions:
+        - getTracksForHome
+
+    Track.author:
+      code: resolvers/Track.author.js
+      functions:
+        - getAuthor
